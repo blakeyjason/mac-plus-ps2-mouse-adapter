@@ -1,3 +1,5 @@
+
+
 /*
  * Convert PS/2 mouse movements to Amiga mouse movements.
  * 
@@ -24,18 +26,29 @@
 
 #define LED 13
 
+// This defines how long to wait between sending pulses.
+// 50 micros for Amiga is just a guess, seems to work out fine.
+// 50 on my Mac Plus results in very strange horizontal mouse behaviour.
+// 150 seems to be the proper amount for the Mac Plus.
+#define MS_DELAY 150
+
 // Input pins
 #define P_PS2_CLK  3
 #define P_PS2_DATA 2
 
 // Output pins              // Cable color to D-sub 9
-#define P_AMIGA_V_PULSE  12 // Purple
-#define P_AMIGA_H_PULSE  11 // Brown
-#define P_AMIGA_VQ_PULSE 10 // Blue
-#define P_AMIGA_HQ_PULSE  9 // White
-#define P_AMIGA_LMB       8 // Yellow
-#define P_AMIGA_RMB       7 // Green
-#define P_AMIGA_MMB       6 // Orange
+// I don't know why these PINS work for MAC... but they do
+// and if I reverse V_PULSE and VQ_PULSE, the Y direction
+// gets inverted.
+#define P_AMIGA_V_PULSE   6 // MAC:Y1 WHITE
+#define P_AMIGA_VQ_PULSE  7 // MAC:Y2 PINK
+
+#define P_AMIGA_H_PULSE   5 // MAC:X2 ORANGE
+#define P_AMIGA_HQ_PULSE  4 // MAC:X1 YELLOW
+
+#define P_AMIGA_LMB       8 // BLUE
+#define P_AMIGA_RMB       11 // NOT USED
+#define P_AMIGA_MMB       12 // NOT USED
 
 static inline int sgn(int val) {
   return (val < 0) ? -1 : ((val > 0) ? 1 : 0);
@@ -71,6 +84,7 @@ static inline int sgn(int val) {
 int p[4]  = { 1, 1, 0, 0 };
 int pq[4] = { 0, 1, 1, 0 };
 
+
 // position in pattern for x and y movement
 int posX = 0;
 int posY = 0;
@@ -80,12 +94,18 @@ void setupMouse() {
   ps2Receive(); // read and ignore status response
   ps2Receive(); // read and ignore device ID
 
-  // Amiga generates 200 impulses/inch, which is  
-  // 0.78 impulses/mm, so let's go with a resolution
-  // of 1 count per mm.
-  ps2SendCommand(PS2_CMD_SET_RESOLUTION);
-  ps2SendCommand(PS2_RES_1_CNT_PER_MM);
 
+  ps2SendCommand(PS2_CMD_SET_RESOLUTION);
+
+  // Macintosh generates 3.54 pulses per mm which is
+  //90 pulses per inch. So, we'll go with a 4 per mm
+  ps2SendCommand(PS2_RES_4_CNT_PER_MM);
+
+  // Amiga generates 200 impulses/inch, which is  
+  // 7.9 impulses/mm, so let's go with a resolution
+  // of 1 count per mm.
+  //ps2SendCommand(PS2_RES_1_CNT_PER_MM);
+  
   // Switch to polling.
   ps2SendCommand(PS2_CMD_SET_REMOTE_MODE);
 }
@@ -144,9 +164,10 @@ void loop() {
   bool rmb = (b1 & PS2_MASK_RMB) > 0;
   bool mmb = (b1 & PS2_MASK_MMB) > 0;
   
-  digitalWrite(P_AMIGA_LMB, lmb ? 0 : 1);
-  digitalWrite(P_AMIGA_MMB, mmb ? 0 : 1);
-  digitalWrite(P_AMIGA_RMB, rmb ? 0 : 1);
+  // For the Mac Plus, all buttons go to the same place...
+  digitalWrite(P_AMIGA_LMB, lmb || rmb || mmb ? 0 : 1);
+ // digitalWrite(P_AMIGA_MMB, mmb ? 0 : 1);
+  //digitalWrite(P_AMIGA_RMB, rmb ? 0 : 1);
 
   // compute direction and steps, both horizontally and vertically.
   // For each pixel, we need to send 4 signals, therefore we multiple
@@ -180,7 +201,6 @@ void loop() {
         stepsX--;
       }
 
-      // 50 micros is just a guess, seems to work out fine.
-      delayMicroseconds(50);
+      delayMicroseconds(MS_DELAY);
   }
 }
