@@ -1,12 +1,11 @@
-# Amiga PS/2 Mouse Adapter
+# Mac Plus PS/2 Mouse Adapter
 
 This is a simple small adapter that transforms your PS/2 mouse into a proper
-Amiga mouse.
+Mac Plus mouse.
 
-A gazillion of people already did this, and you can buy it on ebay, but it
-was more fun to do it myself than to just buy it online :-) Also, the sources
-I found online were somewhat undocumented and weren't easily portable to
-Arduino. This project fixes that :-)
+Much thanks to Andreas for this code to work from.  I only had to tweak a few
+things here and there.
+
 
 # Hardware
 All you need is:
@@ -24,7 +23,7 @@ All you need is:
 3) Compile and upload the sketch.
 
 # Usage
-Just plug the adapter between your Amiga and your PS/2 mouse. 
+Just plug the adapter between your Mac Plus and your PS/2 mouse. 
 
 # Logic Analyzer files
 You can use Saleae's Logic 1.2.18 (available at https://www.saleae.com/downloads/) 
