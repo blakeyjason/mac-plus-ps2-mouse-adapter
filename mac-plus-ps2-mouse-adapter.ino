@@ -1,9 +1,9 @@
-
-
 /*
- * Convert PS/2 mouse movements to Amiga mouse movements.
+ * Convert PS/2 mouse movements to Mac Plus mouse movements.
  * 
  * Copyright (c) 2020 Andreas Signer <asigner@gmail.com>
+ * Updated for Mac Plus mouse by Jason Blakey <jblakey@gmail.com>
+ * Much thanks to Andreas for sharing this code.
  *
  * This file is part of amiga-ps2-mouse-adapter.
  * 
